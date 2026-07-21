@@ -45,9 +45,14 @@ export default function Navbar() {
               <button onClick={() => signOut()} className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">Sign out</button>
             </>
           ) : (
-            <Link href="/auth/signin" className="text-sm bg-gradient-to-br from-violet-600 to-purple-600 text-white px-4 py-2 rounded-lg shadow-sm shadow-violet-200 hover:shadow-violet-300 transition-shadow font-medium">
-              Sign in / Sign up
-            </Link>
+            <>
+              <Link href="/auth/signin" className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                Sign in
+              </Link>
+              <Link href="/auth/signin?intent=signup" className="text-sm bg-gradient-to-br from-violet-600 to-purple-600 text-white px-4 py-2 rounded-lg shadow-sm shadow-violet-200 hover:shadow-violet-300 transition-shadow font-medium">
+                Sign up
+              </Link>
+            </>
           )}
         </div>
 
@@ -77,7 +82,10 @@ export default function Navbar() {
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm text-gray-600">Dashboard</Link>
                   <button onClick={() => signOut()} className="block w-full text-left px-3 py-2 text-sm text-gray-600">Sign out</button>
                 </>
-              : <Link href="/auth/signin" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm text-violet-600 font-medium">Sign in / Sign up</Link>
+              : <>
+                  <Link href="/auth/signin" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm text-gray-600 font-medium">Sign in</Link>
+                  <Link href="/auth/signin?intent=signup" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm text-violet-600 font-semibold">Sign up</Link>
+                </>
             }
           </div>
         </div>

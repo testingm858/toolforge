@@ -9,6 +9,10 @@ import { Zap } from "lucide-react";
 function SignInInner({ googleConfigured }: { googleConfigured: boolean }) {
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl") ?? "/";
+  // There's no separate registration flow — both buttons go through the same
+  // Google OAuth (first sign-in auto-creates the account) — this just adapts
+  // the copy so "Sign up" doesn't confusingly say "Sign in".
+  const isSignup = params.get("intent") === "signup";
 
   return (
     <div className="max-w-md mx-auto px-4 py-20">
@@ -18,9 +22,11 @@ function SignInInner({ googleConfigured }: { googleConfigured: boolean }) {
           <span>ToolForge</span>
         </div>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-2">Sign in</h1>
+        <h1 className="text-xl font-bold text-gray-900 mb-2">{isSignup ? "Create your account" : "Sign in"}</h1>
         <p className="text-gray-500 text-sm mb-8">
-          Sign in to save your usage history and unlock Pro features.
+          {isSignup
+            ? "Sign up free to save your usage history and unlock Pro features."
+            : "Sign in to save your usage history and unlock Pro features."}
         </p>
 
         <button
@@ -28,8 +34,16 @@ function SignInInner({ googleConfigured }: { googleConfigured: boolean }) {
           disabled={!googleConfigured}
           className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Continue with Google
+          {isSignup ? "Sign up with Google" : "Continue with Google"}
         </button>
+
+        <p className="text-xs text-gray-400 mt-4">
+          {isSignup ? (
+            <>Already have an account? <Link href="/auth/signin" className="text-violet-600 hover:underline">Sign in</Link></>
+          ) : (
+            <>New here? <Link href="/auth/signin?intent=signup" className="text-violet-600 hover:underline">Create an account</Link></>
+          )}
+        </p>
 
         {!googleConfigured && (
           <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg p-3 mt-4 text-left">
