@@ -118,7 +118,13 @@ export async function POST(
     if (fileResult!.json !== undefined) {
       return NextResponse.json({ result: fileResult!.json, latencyMs });
     }
-    return new NextResponse(fileResult!.bytes as BodyInit, {
+    // Buffer.from(...), not the raw Uint8Array — passing the typed array
+    // directly as BodyInit round-trips fine under `next dev`, but on
+    // Vercel's deployed Node runtime it gets corrupted in transit (bytes
+    // like the PNG signature's 0x89 turn into the UTF-8 replacement
+    // sequence EF BF BD, inflating and mangling the payload). Confirmed via
+    // a byte-for-byte diff between local dev and a live deployment.
+    return new NextResponse(Buffer.from(fileResult!.bytes!) as BodyInit, {
       status: 200,
       headers: {
         "Content-Type": fileResult!.contentType ?? "application/octet-stream",
@@ -186,11 +192,13 @@ export async function POST(
 
   // ── 5. Return result ──────────────────────────────────────────────────────
   if (success && isBinaryOutput(result)) {
-    return new NextResponse(result.bytes as BodyInit, {
+    // See the matching comment on the file-tools binary response above —
+    // same Buffer.from() fix for the same Vercel-only byte corruption.
+    return new NextResponse(Buffer.from(result.bytes) as BodyInit, {
       status: 200,
       headers: {
         "Content-Type": result.contentType,
-        "Content-Disposition": `attachment; filename="${result.filename}"`,
+        "Content-Disposition": contentDispositionValue(result.filename),
       },
     });
   }
