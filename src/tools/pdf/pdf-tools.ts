@@ -208,7 +208,7 @@ export async function compressPdf(buffer: ArrayBuffer): Promise<{ bytes: Uint8Ar
     newSize: bytes.byteLength,
     note: useRaster
       ? "Maximum compression applied: pages were rasterized and re-encoded at low quality for the smallest possible file size. Text is no longer selectable/searchable."
-      : "This PDF was already tightly encoded, or maximum-compression rasterizing would have produced a larger file — structural compaction (shared object streams) was used instead.",
+      : "This PDF was already tightly encoded, or maximum-compression rasterizing would have produced a larger file - structural compaction (shared object streams) was used instead.",
   };
 }
 

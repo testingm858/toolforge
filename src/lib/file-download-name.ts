@@ -28,3 +28,20 @@ export function contentDispositionValue(filename: string): string {
   const utf8Encoded = encodeURIComponent(filename);
   return `attachment; filename="${asciiSafe}"; filename*=UTF-8''${utf8Encoded}`;
 }
+
+// Every other HTTP header value has the same Latin-1/ByteString constraint
+// as Content-Disposition's basic param, but with no RFC 5987 extended form
+// to fall back on — this has already taken down a response twice (an em
+// dash in a free-text "note" header, twice, in two different strings).
+// Applied centrally to every extraHeaders value rather than trusting each
+// call site to remember to avoid non-ASCII characters.
+export function sanitizeHeaderValue(value: string): string {
+  return value.replace(/[^\x20-\x7e]/g, "?");
+}
+
+export function sanitizeHeaders(headers: Record<string, string> | undefined): Record<string, string> | undefined {
+  if (!headers) return headers;
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers)) out[key] = sanitizeHeaderValue(value);
+  return out;
+}

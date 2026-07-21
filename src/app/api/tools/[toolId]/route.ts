@@ -62,7 +62,7 @@ import { generateInvoicePdf } from "@/tools/pdf/invoice-generator";
 import { generateResumePdf } from "@/tools/pdf/resume-builder";
 import { generateText, generateImageUrl } from "@/lib/ai-provider";
 import { AI_PROMPT_TOOLS } from "@/tools/ai/prompts";
-import { contentDispositionValue } from "@/lib/file-download-name";
+import { contentDispositionValue, sanitizeHeaders } from "@/lib/file-download-name";
 import { convertCurrency } from "@/tools/calc/currency-converter";
 import { lookupIp } from "@/tools/dev/ip-lookup";
 
@@ -129,7 +129,7 @@ export async function POST(
       headers: {
         "Content-Type": fileResult!.contentType ?? "application/octet-stream",
         "Content-Disposition": contentDispositionValue(fileResult!.filename ?? "download"),
-        ...(fileResult!.extraHeaders ?? {}),
+        ...sanitizeHeaders(fileResult!.extraHeaders),
       },
     });
   }
