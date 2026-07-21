@@ -47,7 +47,7 @@ export default async function ToolPage({ params }: Props) {
     const session = await getServerSession(authOptions);
     const userId = (session?.user as { id?: string })?.id;
     if (userId) {
-      const user = prisma.user.findUnique({ where: { id: userId } }) as { plan?: string; credits?: number } | null;
+      const user = await prisma.user.findUnique({ where: { id: userId } });
       hasPremiumAccess = user?.plan === "PRO" || user?.plan === "ENTERPRISE";
       userCredits = user?.credits ?? 0;
     }

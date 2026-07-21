@@ -1,24 +1,18 @@
-// Toolforge — Prisma Schema (reference only, NOT currently wired up)
+// Toolforge — Prisma Schema
 //
-// The app does not use Prisma at runtime. src/lib/db.ts implements the same
-// tables directly on Node's built-in node:sqlite, and src/lib/prisma.ts is a
-// hand-written shim that mimics the small slice of the Prisma client API the
-// app calls, so existing `import prisma from "./prisma"` call sites keep
-// working. There is no @prisma/client dependency and no generated client.
-//
-// Keep this file as the documented target shape for a future Postgres
-// migration (swap db.ts/prisma.ts for `@prisma/client` + `provider =
-// "postgresql"` + a real DATABASE_URL) — don't run `prisma db push` or
-// `prisma generate` against it, they have nothing to connect to without that
-// migration.
+// Backed by Postgres (Neon, provisioned via the Vercel marketplace
+// integration). directUrl uses the unpooled connection string — Neon's
+// pooled endpoint (used for normal query traffic via `url`) doesn't
+// reliably support the prepared statements Prisma's migration engine needs.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // ─── Auth ────────────────────────────────────────────────────────────────────

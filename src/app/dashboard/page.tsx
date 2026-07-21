@@ -16,12 +16,8 @@ export default async function DashboardPage() {
     redirect("/auth/signin?callbackUrl=/dashboard");
   }
 
-  const user = prisma.user.findUnique({ where: { id: userId } }) as
-    | { plan?: string; credits?: number }
-    | null;
-  const subscription = prisma.subscription.findUnique({ where: { userId } }) as
-    | { stripeCustomerId?: string; currentPeriodEnd?: string; cancelAtPeriodEnd?: number }
-    | null;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const subscription = await prisma.subscription.findUnique({ where: { userId } });
 
   const planKey = (user?.plan as PlanKey) ?? "FREE";
   const plan = PLANS[planKey] ?? PLANS.FREE;

@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
 
       if (userId && plan) {
         const creditsMap: Record<string, number> = { PRO: 500, ENTERPRISE: 5000 };
-        prisma.user.update({ where: { id: userId }, data: { plan, credits: creditsMap[plan] } });
-        prisma.subscription.upsert({
+        await prisma.user.update({ where: { id: userId }, data: { plan, credits: creditsMap[plan] } });
+        await prisma.subscription.upsert({
           where: { userId },
           create: {
             userId,
@@ -54,30 +54,30 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_succeeded": {
       const subId = obj.subscription as string;
-      const sub = prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } }) as Record<string, unknown> | null;
+      const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } });
       if (sub) {
-        prisma.user.update({
-          where: { id: sub.userId as string },
-          data: { credits: sub.creditsMonthly as number },
+        await prisma.user.update({
+          where: { id: sub.userId },
+          data: { credits: sub.creditsMonthly },
         });
       }
       break;
     }
 
     case "customer.subscription.deleted": {
-      const sub = prisma.subscription.findFirst({ where: { stripeSubscriptionId: obj.id as string } }) as Record<string, unknown> | null;
+      const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: obj.id as string } });
       if (sub) {
-        prisma.user.update({ where: { id: sub.userId as string }, data: { plan: "FREE", credits: 0 } });
-        prisma.subscription.update({ where: { userId: sub.userId as string }, data: { status: "CANCELLED", plan: "FREE" } });
+        await prisma.user.update({ where: { id: sub.userId }, data: { plan: "FREE", credits: 0 } });
+        await prisma.subscription.update({ where: { userId: sub.userId }, data: { status: "CANCELLED", plan: "FREE" } });
       }
       break;
     }
 
     case "invoice.payment_failed": {
       const subId = obj.subscription as string;
-      const sub = prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } }) as Record<string, unknown> | null;
+      const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } });
       if (sub) {
-        prisma.subscription.update({ where: { userId: sub.userId as string }, data: { status: "PAST_DUE" } });
+        await prisma.subscription.update({ where: { userId: sub.userId }, data: { status: "PAST_DUE" } });
       }
       break;
     }

@@ -13,7 +13,7 @@ export async function POST() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const subscription = prisma.subscription.findUnique({ where: { userId } }) as { stripeCustomerId?: string } | null;
+  const subscription = await prisma.subscription.findUnique({ where: { userId } });
   if (!subscription?.stripeCustomerId) {
     return NextResponse.json({ error: "No active subscription found" }, { status: 404 });
   }
